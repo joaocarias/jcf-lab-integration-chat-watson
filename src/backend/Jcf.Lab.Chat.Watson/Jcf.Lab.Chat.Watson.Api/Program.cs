@@ -4,6 +4,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.Configure<WatsonEmbedOptions>(
+    builder.Configuration.GetSection(WatsonEmbedOptions.SectionName));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -1,0 +1,43 @@
+services:
+
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+    container_name: jcf-watson-backend
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5000
+      # Watson embed config
+      Watson__IntegrationID: ${WATSON_INTEGRATION_ID}
+      Watson__Region: ${WATSON_REGION}
+      Watson__ServiceInstanceID: ${WATSON_SERVICE_INSTANCE_ID}
+      # CORS
+      Cors__AllowedOrigins__0: http://localhost:5173
+      Cors__AllowedOrigins__1: http://frontend
+    ports:
+      - "5000:5000"
+    networks:
+      - app-net
+   
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+      target: dev                    # trocar para 'production' no deploy
+    container_name: jcf-watson-frontend
+    restart: unless-stopped
+    volumes:
+      - ./src/frontend/Jcf.Lab.Chat.Watson.Web/src:/app/src          # hot reload
+      - ./src/frontend/Jcf.Lab.Chat.Watson.Web/public:/app/public
+    ports:
+      - "5173:5173"
+    networks:
+      - app-net
+    depends_on:
+      - backend
+
+networks:
+  app-net:
+    driver: bridge
